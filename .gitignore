@@ -3,3 +3,4 @@
 replit.nix
 pyproject.toml
 venv/
+__pycache__
