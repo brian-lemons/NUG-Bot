@@ -2,6 +2,11 @@ import os
 import hikari
 import lightbulb
 import aiohttp
+from dotenv import load_dotenv   #for python-dotenv method
+load_dotenv()                    #for python-dotenv method
+
+import os 
+
 
 secret_guild = int(os.environ['SECRET_GUILD'])
 bot = lightbulb.BotApp(token=os.environ['DISCORD_BOT_SECRET'],
