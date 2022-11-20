@@ -40,13 +40,6 @@ async def nuggets_collect(ctx: lightbulb.Context):
                       " nuggets! You now have: " + str(current_nuggets) +
                       " nuggets!")
 
-
-
-                      
-  '''
-  
-  
-
 #Check amount command
 @nuggets_plugin.command()
 @lightbulb.command("inventory_nugs",
@@ -67,6 +60,9 @@ async def inventory_nugs(ctx: lightbulb.Context):
   embed.add_field("Trees", str(get_item(ctx.user.id, "trees")))
 
   await ctx.respond(embed)
+
+
+  '''
 
 
 #Leaderboard Command
