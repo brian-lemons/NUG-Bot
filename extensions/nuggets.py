@@ -20,39 +20,32 @@ nuggets_plugin = lightbulb.Plugin("nuggets")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def nuggets_collect(ctx: lightbulb.Context):
   nugget_amount = random.randrange(25, 500)
+  default_seed_amount = 1
 
   refresh_user_info(ctx.user.id, ctx.user.username)
 
   add_item(ctx.user.id, nugget_amount, "nuggets")
+  current_nuggets = get_item(ctx.user.id, "nuggets")
 
-  #Check if user exists in database
-
-  '''
-  
-  current_nuggets = int(db[key]["nuggets"])
-  current_nuggets += nugget_amount
-  refresh_user_info(ctx.author.id, current_nuggets, ctx.author.username)
   if nugget_amount <= 300:
-    add_item(ctx.user.id, 1, "seeds")
+    add_item(ctx.user.id, default_seed_amount, "seeds")
     await ctx.respond(
       "You've found: " + str(nugget_amount) + " nuggets! You now have: " +
       str(current_nuggets) +
       " nuggets! Oh, and take this seed I found as well. Might grow into something new!"
     )
     return
-  else:
 
-    await ctx.respond("You've found: " + str(nugget_amount) +
+  await ctx.respond("You've found: " + str(nugget_amount) +
                       " nuggets! You now have: " + str(current_nuggets) +
                       " nuggets!")
-    return
 
-  new_nuggets = nugget_amount
-  refresh_user_info(ctx.author.id, new_nuggets, ctx.author.username)
-  await ctx.respond("You've found: " + str(nugget_amount) +
-                    " nuggets! You now have: " + str(new_nuggets) +
-                    " nuggets!")
 
+
+                      
+  '''
+  
+  
 
 #Check amount command
 @nuggets_plugin.command()
@@ -422,6 +415,7 @@ def set_item(user_id, amount, item):
       else:
         db[key][item] = amount
 '''
+#Add new items to user database
 def add_item(user_id, amount, item):
   connection = sqlite3.connect("users.db")
   cursor = connection.cursor()
@@ -437,6 +431,19 @@ def add_item(user_id, amount, item):
   for row in cursor.execute("SELECT * FROM users"):
     print(row)
   connection.close()
+
+def get_item(user_id, item):
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
+
+  cursor.execute("SELECT " + item + " FROM users WHERE user_id= ?", (user_id, ))
+  item_row = cursor.fetchone()
+  value = item_row[0]
+  connection.commit()
+
+  connection.close()
+
+  return value
 
 '''
 
