@@ -12,7 +12,7 @@ nuggets_plugin = lightbulb.Plugin("nuggets")
 
 
 #Nuggets Collect Command
-@lightbulb.add_cooldown(86400, 1, lightbulb.UserBucket)
+#@lightbulb.add_cooldown(86400, 1, lightbulb.UserBucket)
 @nuggets_plugin.command()
 @lightbulb.command("nuggets_collect",
                    "Collect your daily nuggets!",
@@ -22,6 +22,8 @@ async def nuggets_collect(ctx: lightbulb.Context):
   nugget_amount = random.randrange(25, 500)
 
   refresh_user_info(ctx.user.id, ctx.user.username)
+
+  add_item(ctx.user.id, nugget_amount, "nuggets")
 
   #Check if user exists in database
 
@@ -400,28 +402,6 @@ def refresh_user_info(user_id, user_name):
   connection.close()
 
 
-  #for key in db.keys():
-   # if key == str(user_id):
-      #db[key]["user_id"] = user_id
-      #db[key]["nuggets"] = nugget_amount
-      #db[key]["user_name"] = user_name
-
-    #If not in the database, add them
-    #if str(user_id) not in db:
-      #user_info = {
-        #"id": user_id,
-        #"nuggets": nugget_amount,
-        #"user_name": user_name,
-        #"seeds": 0,
-        #"trees": 0,
-        #"plots": 0,
-        #"plot_price": 100,
-      #}
-
-      #db[user_id] = user_info
-
-
-
 '''
 def add_tree(user_id, tree_amount):
   for key in db.keys():
@@ -442,14 +422,23 @@ def set_item(user_id, amount, item):
       else:
         db[key][item] = amount
 '''
-'''
 def add_item(user_id, amount, item):
-  for key in db.keys():
-    if key == str(user_id):
-      if item not in db[key]:
-        db[key].update({item: amount})
-      else:
-        db[key][item] += amount
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
+
+  cursor.execute("SELECT " + item + " FROM users WHERE user_id= ?", (user_id, ))
+  item_row = cursor.fetchone()
+  current_amount = item_row[0]
+  amount += current_amount
+
+  cursor.execute("UPDATE users SET " + item + "= ? WHERE user_id= ?", (amount, user_id))
+  connection.commit()
+
+  for row in cursor.execute("SELECT * FROM users"):
+    print(row)
+  connection.close()
+
+'''
 
 def remove_item(user_id, amount, item):
   for key in db.keys():
