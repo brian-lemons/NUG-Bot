@@ -21,27 +21,29 @@ nuggets_plugin = lightbulb.Plugin("nuggets")
 async def nuggets_collect(ctx: lightbulb.Context):
   nugget_amount = random.randrange(25, 500)
 
+  refresh_user_info(ctx.user.id, ctx.user.username)
+
   #Check if user exists in database
 
-  for key in db.keys():
-    if key == str(ctx.author.id):
-      current_nuggets = int(db[key]["nuggets"])
-      current_nuggets += nugget_amount
-      refresh_user_info(ctx.author.id, current_nuggets, ctx.author.username)
-      if nugget_amount <= 300:
-        add_item(ctx.user.id, 1, "seeds")
-        await ctx.respond(
-          "You've found: " + str(nugget_amount) + " nuggets! You now have: " +
-          str(current_nuggets) +
-          " nuggets! Oh, and take this seed I found as well. Might grow into something new!"
-        )
-        return
-      else:
+  '''
+  
+  current_nuggets = int(db[key]["nuggets"])
+  current_nuggets += nugget_amount
+  refresh_user_info(ctx.author.id, current_nuggets, ctx.author.username)
+  if nugget_amount <= 300:
+    add_item(ctx.user.id, 1, "seeds")
+    await ctx.respond(
+      "You've found: " + str(nugget_amount) + " nuggets! You now have: " +
+      str(current_nuggets) +
+      " nuggets! Oh, and take this seed I found as well. Might grow into something new!"
+    )
+    return
+  else:
 
-        await ctx.respond("You've found: " + str(nugget_amount) +
-                          " nuggets! You now have: " + str(current_nuggets) +
-                          " nuggets!")
-        return
+    await ctx.respond("You've found: " + str(nugget_amount) +
+                      " nuggets! You now have: " + str(current_nuggets) +
+                      " nuggets!")
+    return
 
   new_nuggets = nugget_amount
   refresh_user_info(ctx.author.id, new_nuggets, ctx.author.username)
@@ -49,7 +51,7 @@ async def nuggets_collect(ctx: lightbulb.Context):
                     " nuggets! You now have: " + str(new_nuggets) +
                     " nuggets!")
 
-'''
+
 #Check amount command
 @nuggets_plugin.command()
 @lightbulb.command("inventory_nugs",
@@ -356,22 +358,23 @@ async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
   return False
 '''
 
-def refresh_user_info(user_id, nugget_amount, user_name):
+def refresh_user_info(user_id, user_name):
+  default_nuggets = 0
   default_seeds = 0
   default_trees = 0
   default_plots = 0
   default_plot_price = 0
 
   user_info = [
-    (user_id, nugget_amount, user_name, default_seeds, default_trees, default_plots, default_plot_price)
+    (user_id, default_nuggets, user_name, default_seeds, default_trees, default_plots, default_plot_price)
     ]
 
   cursor = connection.cursor()
 
   #Check to see if user table exists
-  tables = cursor.execute("SELECT users from sqlite_master WHERE type='table' AND tableName='users';").fetchall()
+  tables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").fetchall()
   if tables == []:
-    cursor.execute("CREATE TABLE users (user_id INTEGER, nuggets INTEGER, user_name TEXT, seeds INTEGER, trees INTEGER, plots INTEGER, plot_price INTEGER")
+    cursor.execute("CREATE TABLE users (user_id TEXT, nuggets INTEGER, user_name TEXT, seeds INTEGER, trees INTEGER, plots INTEGER, plot_price INTEGER)")
     cursor.executemany("INSERT INTO users VALUES (?,?,?,?,?,?,?)", user_info)
     connection.commit()
   
@@ -385,8 +388,12 @@ def refresh_user_info(user_id, nugget_amount, user_name):
         connection.commit()
       else:
         cursor.execute("UPDATE users SET user_id= ? WHERE user_id= ?", (user_id, user_id))
-        cursor.execute("UPDATE users SET nuggets= ? WHERE user_id= ?", (nugget_amount, user_id))
         cursor.execute("UPDATE users SET user_name= ? WHERE user_id= ?", (user_name, user_id))
+        connection.commit()
+  
+  for row in cursor.execute("SELECT * FROM users"):
+    print(row)
+  connection.close()
 
 
   #for key in db.keys():
@@ -410,13 +417,8 @@ def refresh_user_info(user_id, nugget_amount, user_name):
       #db[user_id] = user_info
 
 
-def refresh_database():
-  for key in db.keys():
-    db[key]["trees"] = 0
-    db[key]["plots"] = 0
-    db[key]["plot_price"] = 100
 
-
+'''
 def add_tree(user_id, tree_amount):
   for key in db.keys():
     if key == str(user_id):
@@ -435,8 +437,8 @@ def set_item(user_id, amount, item):
         db[key].update({item: amount})
       else:
         db[key][item] = amount
-
-
+'''
+'''
 def add_item(user_id, amount, item):
   for key in db.keys():
     if key == str(user_id):
@@ -460,13 +462,14 @@ def get_item(user_id, item):
         db[key].update({item: 0})
 
       return db[key][item]
-
+'''
+'''
 def set_plot_price(user_id):
   modifier = 2
   last_price = get_item(user_id, "plot_price")
   new_price = last_price * modifier
   set_item(user_id, new_price, "plot_price")
-
+'''
 
 
 def load(bot: lightbulb.BotApp) -> None:
