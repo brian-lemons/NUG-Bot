@@ -7,7 +7,7 @@ import sqlite3
 from operator import itemgetter
 
 
-connection = sqlite3.connect("users.db")
+
 nuggets_plugin = lightbulb.Plugin("nuggets")
 
 
@@ -359,6 +359,9 @@ async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
 '''
 
 def refresh_user_info(user_id, user_name):
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
+
   default_nuggets = 0
   default_seeds = 0
   default_trees = 0
@@ -369,27 +372,28 @@ def refresh_user_info(user_id, user_name):
     (user_id, default_nuggets, user_name, default_seeds, default_trees, default_plots, default_plot_price)
     ]
 
-  cursor = connection.cursor()
+  
 
   #Check to see if user table exists
   tables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").fetchall()
   if tables == []:
-    cursor.execute("CREATE TABLE users (user_id TEXT, nuggets INTEGER, user_name TEXT, seeds INTEGER, trees INTEGER, plots INTEGER, plot_price INTEGER)")
+    cursor.execute("CREATE TABLE users (user_id INTEGER, nuggets INTEGER, user_name TEXT, seeds INTEGER, trees INTEGER, plots INTEGER, plot_price INTEGER)")
     cursor.executemany("INSERT INTO users VALUES (?,?,?,?,?,?,?)", user_info)
     connection.commit()
   
   else:
     #Check if user exists in table
-    for id in (user_id):
-      cursor.execute("SELECT rowid FROM components WHERE user_id = ?", (user_id, ))
-      data= cursor.fetchone()[0]
-      if data == 0:
-        cursor.executemany("INSERT INTO users VALUES (?,?,?,?,?,?,?)", user_info)
-        connection.commit()
-      else:
-        cursor.execute("UPDATE users SET user_id= ? WHERE user_id= ?", (user_id, user_id))
-        cursor.execute("UPDATE users SET user_name= ? WHERE user_id= ?", (user_name, user_id))
-        connection.commit()
+    cursor.execute("SELECT rowid FROM users WHERE user_id = ?", (user_id, ))
+    data= cursor.fetchone()
+    print(data)
+    if data is None:
+      cursor.executemany("INSERT INTO users VALUES (?,?,?,?,?,?,?)", user_info)
+      print(data)
+      connection.commit()
+    else:
+      cursor.execute("UPDATE users SET user_id= ? WHERE user_id= ?", (user_id, user_id))
+      cursor.execute("UPDATE users SET user_name= ? WHERE user_id= ?", (user_name, user_id))
+      connection.commit()
   
   for row in cursor.execute("SELECT * FROM users"):
     print(row)
