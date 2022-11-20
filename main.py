@@ -2,15 +2,18 @@ import os
 import hikari
 import lightbulb
 import aiohttp
-from dotenv import load_dotenv   #for python-dotenv method
-load_dotenv()                    #for python-dotenv method
+import dotenv 
+import asyncio
 
-import os 
+dotenv.load_dotenv()
 
 
-secret_guild = int(os.environ['SECRET_GUILD'])
-bot = lightbulb.BotApp(token=os.environ['DISCORD_BOT_SECRET'],
-                         default_enabled_guilds=(secret_guild))
+
+secret_guild = os.environ['SECRET_GUILD']
+bot = lightbulb.BotApp(
+  os.environ["DISCORD_BOT_SECRET"],
+  intents=hikari.Intents.ALL,
+)
   
 bot.load_extensions_from("./extensions/")
   
