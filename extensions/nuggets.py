@@ -3,9 +3,11 @@ import lightbulb
 import math
 import random
 import datetime
-from replit import db
+import sqlite3
 from operator import itemgetter
 
+
+connection = sqlite3.connect("users.db")
 nuggets_plugin = lightbulb.Plugin("nuggets")
 
 
@@ -47,7 +49,7 @@ async def nuggets_collect(ctx: lightbulb.Context):
                     " nuggets! You now have: " + str(new_nuggets) +
                     " nuggets!")
 
-
+'''
 #Check amount command
 @nuggets_plugin.command()
 @lightbulb.command("inventory_nugs",
@@ -352,31 +354,60 @@ async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
       f"This command is on cooldown! You can use it again in " + str(time))
     return True
   return False
-
+'''
 
 def refresh_user_info(user_id, nugget_amount, user_name):
+  default_seeds = 0
+  default_trees = 0
+  default_plots = 0
+  default_plot_price = 0
 
-  #Checks if user is in the databas
+  user_info = [
+    (user_id, nugget_amount, user_name, default_seeds, default_trees, default_plots, default_plot_price)
+    ]
 
-  for key in db.keys():
-    if key == str(user_id):
-      db[key]["user_id"] = user_id
-      db[key]["nuggets"] = nugget_amount
-      db[key]["user_name"] = user_name
+  cursor = connection.cursor()
+
+  #Check to see if user table exists
+  tables = cursor.execute("SELECT users from sqlite_master WHERE type='table' AND tableName='users';").fetchall()
+  if tables == []:
+    cursor.execute("CREATE TABLE users (user_id INTEGER, nuggets INTEGER, user_name TEXT, seeds INTEGER, trees INTEGER, plots INTEGER, plot_price INTEGER")
+    cursor.executemany("INSERT INTO users VALUES (?,?,?,?,?,?,?)", user_info)
+    connection.commit()
+  
+  else:
+    #Check if user exists in table
+    for id in (user_id):
+      cursor.execute("SELECT rowid FROM components WHERE user_id = ?", (user_id, ))
+      data= cursor.fetchone()[0]
+      if data == 0:
+        cursor.executemany("INSERT INTO users VALUES (?,?,?,?,?,?,?)", user_info)
+        connection.commit()
+      else:
+        cursor.execute("UPDATE users SET user_id= ? WHERE user_id= ?", (user_id, user_id))
+        cursor.execute("UPDATE users SET nuggets= ? WHERE user_id= ?", (nugget_amount, user_id))
+        cursor.execute("UPDATE users SET user_name= ? WHERE user_id= ?", (user_name, user_id))
+
+
+  #for key in db.keys():
+   # if key == str(user_id):
+      #db[key]["user_id"] = user_id
+      #db[key]["nuggets"] = nugget_amount
+      #db[key]["user_name"] = user_name
 
     #If not in the database, add them
-    if str(user_id) not in db:
-      user_info = {
-        "id": user_id,
-        "nuggets": nugget_amount,
-        "user_name": user_name,
-        "seeds": 0,
-        "trees": 0,
-        "plots": 0,
-        "plot_price": 100,
-      }
+    #if str(user_id) not in db:
+      #user_info = {
+        #"id": user_id,
+        #"nuggets": nugget_amount,
+        #"user_name": user_name,
+        #"seeds": 0,
+        #"trees": 0,
+        #"plots": 0,
+        #"plot_price": 100,
+      #}
 
-      db[user_id] = user_info
+      #db[user_id] = user_info
 
 
 def refresh_database():

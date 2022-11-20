@@ -4,6 +4,9 @@ import lightbulb
 import aiohttp
 import dotenv 
 import asyncio
+import sqlite3
+
+connection = sqlite3.connect("users.db")
 
 dotenv.load_dotenv()
 
@@ -27,5 +30,7 @@ async def on_starting(event: hikari.StartingEvent) -> None:
 async def on_stopping(event: hikari.StoppingEvent) -> None:
   await bot.d.aio_session.close()
 
+
+connection.close()
 bot.run()
 
