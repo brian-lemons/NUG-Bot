@@ -61,10 +61,6 @@ async def inventory_nugs(ctx: lightbulb.Context):
 
   await ctx.respond(embed)
 
-
-  '''
-
-
 #Leaderboard Command
 @nuggets_plugin.command()
 @lightbulb.command("nuggets_leaderboard",
@@ -72,11 +68,45 @@ async def inventory_nugs(ctx: lightbulb.Context):
                    pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def nuggets_leaderboard(ctx: lightbulb.Context):
-  embed = (hikari.Embed(title="Most Collected Nuggets", ).add_field(
-    "Leaderboard", "Placeholder"))
+  embed = (
+    hikari.Embed
+    (
+      title="Most Collected Nuggets", 
+    )
+    .add_field(
+    "Leaderboard", "Placeholder"
+    )
+  )
 
-  leaderboard = {}
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
 
+
+  cursor.execute("SELECT user_name, nuggets FROM users ORDER BY nuggets DESC")
+  users = cursor.fetchall()
+
+  leaderboard = dict(users)
+  print(leaderboard)
+
+  #sort
+  sorted_leaderboard = sorted(leaderboard.items(), key=itemgetter(1))
+  sorted_leaderboard_dict = dict(sorted_leaderboard)
+
+
+  current_text = ""
+  position = 0
+  position = len(sorted_leaderboard_dict) + 1
+
+
+  for key, value in sorted_leaderboard_dict.items():
+    position -= 1
+    new_text = str(position) + ". " + key + " (" + str(value) + ") \n"
+    current_text = new_text + current_text
+
+  embed.edit_field(0, "Leaderboard", current_text)
+  await ctx.respond(embed)
+  
+'''
   #Print out the current leaderboard
   for key in db.keys():
     user = db[key]["user_name"]
@@ -96,6 +126,10 @@ async def nuggets_leaderboard(ctx: lightbulb.Context):
 
   embed.edit_field(0, "Leaderboard", current_text)
   await ctx.respond(embed)
+
+  
+
+
 
 
 #Give command
