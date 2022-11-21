@@ -12,7 +12,7 @@ nuggets_plugin = lightbulb.Plugin("nuggets")
 
 
 #Nuggets Collect Command
-#@lightbulb.add_cooldown(86400, 1, lightbulb.UserBucket)
+@lightbulb.add_cooldown(86400, 1, lightbulb.UserBucket)
 @nuggets_plugin.command()
 @lightbulb.command("nuggets_collect",
                    "Collect your daily nuggets!",
@@ -347,7 +347,7 @@ async def buy(ctx: lightbulb.Context, item: hikari.OptionType.STRING, amount: hi
 
         await ctx.respond("You don't have enough nuggets to purchase")
         return
-
+'''
 @nuggets_plugin.set_error_handler
 async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
   exception = event.exception.__cause__ or event.exception
@@ -358,7 +358,7 @@ async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
       f"This command is on cooldown! You can use it again in " + str(time))
     return True
   return False
-'''
+
 
 def refresh_user_info(user_id, user_name):
   connection = sqlite3.connect("users.db")
@@ -422,6 +422,16 @@ def set_item(user_id, amount, item):
       else:
         db[key][item] = amount
 '''
+#Set new items to user database
+def set_item(user_id, amount, item):
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
+
+  cursor.execute("UPDATE users SET " + item + "= ? WHERE user_id= ?", (amount, user_id))
+  connection.commit()
+
+  connection.close()
+
 #Add new items to user database
 def add_item(user_id, amount, item):
   connection = sqlite3.connect("users.db")
@@ -435,8 +445,21 @@ def add_item(user_id, amount, item):
   cursor.execute("UPDATE users SET " + item + "= ? WHERE user_id= ?", (amount, user_id))
   connection.commit()
 
-  for row in cursor.execute("SELECT * FROM users"):
-    print(row)
+  connection.close()
+
+#Remove new items to user database
+def remove_item(user_id, amount, item):
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
+
+  cursor.execute("SELECT " + item + " FROM users WHERE user_id= ?", (user_id, ))
+  item_row = cursor.fetchone()
+  current_amount = item_row[0]
+  amount -= current_amount
+
+  cursor.execute("UPDATE users SET " + item + "= ? WHERE user_id= ?", (amount, user_id))
+  connection.commit()
+
   connection.close()
 
 def get_item(user_id, item):
