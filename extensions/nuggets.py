@@ -12,7 +12,7 @@ nuggets_plugin = lightbulb.Plugin("nuggets")
 
 
 #Nuggets Collect Command
-#@lightbulb.add_cooldown(86400, 1, lightbulb.UserBucket)
+@lightbulb.add_cooldown(86400, 1, lightbulb.UserBucket)
 @nuggets_plugin.command()
 @lightbulb.command("nuggets_collect",
                    "Collect your daily nuggets!",
