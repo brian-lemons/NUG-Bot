@@ -347,6 +347,7 @@ async def buy(ctx: lightbulb.Context, item: hikari.OptionType.STRING, amount: hi
 
         await ctx.respond("You don't have enough nuggets to purchase")
         return
+'''
 
 @nuggets_plugin.set_error_handler
 async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
@@ -358,7 +359,7 @@ async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
       f"This command is on cooldown! You can use it again in " + str(time))
     return True
   return False
-'''
+
 
 def refresh_user_info(user_id, user_name):
   connection = sqlite3.connect("users.db")
