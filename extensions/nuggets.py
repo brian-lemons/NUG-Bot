@@ -107,30 +107,7 @@ async def nuggets_leaderboard(ctx: lightbulb.Context):
   await ctx.respond(embed)
   
 '''
-  #Print out the current leaderboard
-  for key in db.keys():
-    user = db[key]["user_name"]
-    total_nuggets = db[key]["nuggets"]
-    leaderboard[user] = total_nuggets
-
-  #sort
-  sorted_leaderboard = sorted(leaderboard.items(), key=itemgetter(1))
-  sorted_leaderboard_dict = dict(sorted_leaderboard)
-
-  position = len(sorted_leaderboard_dict) + 1
-  current_text = ""
-  for key, value in sorted_leaderboard_dict.items():
-    position -= 1
-    new_text = str(position) + ". " + key + " (" + str(value) + ") \n"
-    current_text = new_text + current_text
-
-  embed.edit_field(0, "Leaderboard", current_text)
-  await ctx.respond(embed)
-
   
-
-
-
 
 #Give command
 @nuggets_plugin.command()
