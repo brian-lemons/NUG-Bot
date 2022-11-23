@@ -414,13 +414,6 @@ def add_tree(user_id, tree_amount):
       remove_item(user_id, tree_amount, "seeds")
       remove_item(user_id, tree_amount, "plots")
 
-def set_item(user_id, amount, item):
-  for key in db.keys():
-    if key == str(user_id):
-      if item not in db[key]:
-        db[key].update({item: amount})
-      else:
-        db[key][item] = amount
 '''
 #Set new items to user database
 def set_item(user_id, amount, item):
@@ -475,24 +468,6 @@ def get_item(user_id, item):
 
   return value
 
-'''
-
-def remove_item(user_id, amount, item):
-  for key in db.keys():
-    if key == str(user_id):
-      if item not in db[key]:
-        db[key].update({item: amount})
-      else:
-        db[key][item] -= amount
-
-def get_item(user_id, item):
-  for key in db.keys():
-    if key == str(user_id):
-      if item not in db[key]:
-        db[key].update({item: 0})
-
-      return db[key][item]
-'''
 '''
 def set_plot_price(user_id):
   modifier = 2
