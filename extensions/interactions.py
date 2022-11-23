@@ -104,6 +104,28 @@ async def magic_attack(ctx: lightbulb.Context, user: Optional[hikari.User] = Non
     )
     await ctx.respond(embed)
 
+#Take your damn turn!
+@interactions_plugin.command()
+@lightbulb.option(
+    "user", "The user who needs a reminder!", hikari.User, required=False
+)
+@lightbulb.command("tick_tock", "Take your damn turn!", pass_options=True)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def tick_tock(ctx: lightbulb.context, user: Optional[hikari.User] = None) -> None:
+    embed = (
+        hikari.Embed(
+            title="Take your damn turn!",
+            
+        )
+        .add_field(
+            "Time is ticking!",
+            f"( ಠ ͜ʖಠ) {user.mention}",
+        )
+        .set_image(
+            "https://i.gifer.com/MDO.gif"
+        )
+    )
+    await ctx.respond(embed)
 
 def load(bot: lightbulb.BotApp) -> None:
 

@@ -423,6 +423,16 @@ def set_item(user_id, amount, item):
       else:
         db[key][item] = amount
 '''
+#Set new items to user database
+def set_item(user_id, amount, item):
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
+
+  cursor.execute("UPDATE users SET " + item + "= ? WHERE user_id= ?", (amount, user_id))
+  connection.commit()
+
+  connection.close()
+
 #Add new items to user database
 def add_item(user_id, amount, item):
   connection = sqlite3.connect("users.db")
@@ -436,8 +446,21 @@ def add_item(user_id, amount, item):
   cursor.execute("UPDATE users SET " + item + "= ? WHERE user_id= ?", (amount, user_id))
   connection.commit()
 
-  for row in cursor.execute("SELECT * FROM users"):
-    print(row)
+  connection.close()
+
+#Remove new items to user database
+def remove_item(user_id, amount, item):
+  connection = sqlite3.connect("users.db")
+  cursor = connection.cursor()
+
+  cursor.execute("SELECT " + item + " FROM users WHERE user_id= ?", (user_id, ))
+  item_row = cursor.fetchone()
+  current_amount = item_row[0]
+  amount -= current_amount
+
+  cursor.execute("UPDATE users SET " + item + "= ? WHERE user_id= ?", (amount, user_id))
+  connection.commit()
+
   connection.close()
 
 def get_item(user_id, item):
