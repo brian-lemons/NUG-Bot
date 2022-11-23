@@ -348,6 +348,7 @@ async def buy(ctx: lightbulb.Context, item: hikari.OptionType.STRING, amount: hi
         await ctx.respond("You don't have enough nuggets to purchase")
         return
 '''
+
 @nuggets_plugin.set_error_handler
 async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
   exception = event.exception.__cause__ or event.exception
