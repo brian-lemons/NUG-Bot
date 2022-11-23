@@ -122,7 +122,7 @@ async def tick_tock(ctx: lightbulb.context, user: Optional[hikari.User] = None) 
             f"( ಠ ͜ʖಠ) {user.mention}",
         )
         .set_image(
-            "https://i.gifer.com/MDO.gif"
+            "https://media.tenor.com/Yx4js0bvIiYAAAAC/tick-tock-debate-me.gif"
         )
     )
     await ctx.respond(embed)
