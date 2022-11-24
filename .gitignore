@@ -7,3 +7,4 @@ package.json
 node_modules
 .venv
 users.db
+extensions/dev.py

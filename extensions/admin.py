@@ -18,6 +18,7 @@ async def create_post(ctx: lightbulb.Context, title: hikari.OptionType.STRING, m
 
   await ctx.respond(embed)
 
+
 def load(bot: lightbulb.BotApp) -> None:
 
   bot.add_plugin(admin_plugin)
