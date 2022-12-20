@@ -115,7 +115,7 @@ async def give_nuggets(ctx: lightbulb.Context, user: hikari.User, amount: hikari
 
   refresh_user_info(ctx.user.id, ctx.user.username)
   refresh_user_info(user.id, user.username)
-  
+
   givers_current_nuggets = int(get_item(ctx.user.id, "nuggets"))
   receivers_current_nuggets = int(get_item(user.id, "nuggets"))
   
@@ -127,7 +127,7 @@ async def give_nuggets(ctx: lightbulb.Context, user: hikari.User, amount: hikari
     givers_new_nuggets = givers_current_nuggets - amount
     receivers_new_nuggets = receivers_current_nuggets + amount
 
-    set_item(ctx.user.id, givers_current_nuggets, "nuggets")
+    set_item(ctx.user.id, givers_new_nuggets, "nuggets")
     set_item(user.id, receivers_new_nuggets, "nuggets")
 
     givers_current_nuggets = int(get_item(ctx.user.id, "nuggets"))
