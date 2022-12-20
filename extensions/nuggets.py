@@ -123,6 +123,11 @@ async def give_nuggets(ctx: lightbulb.Context, user: hikari.User, amount: hikari
   if givers_current_nuggets < amount or amount < 1:
     await ctx.respond("I am afraid you don't have that amount of nuggets to give")
     return
+  
+  if ctx.user.id == user.id:
+    await ctx.respond("Nice try >.>. You can't give yourself nuggets silly.")
+    return
+    
   else:
     givers_new_nuggets = givers_current_nuggets - amount
     receivers_new_nuggets = receivers_current_nuggets + amount
