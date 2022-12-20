@@ -19,7 +19,7 @@ bot = lightbulb.BotApp(
   intents=hikari.Intents.ALL,
 )
 
-miru.load(bot)  
+miru.install(bot)  
 bot.load_extensions_from("./extensions/")
   
   
