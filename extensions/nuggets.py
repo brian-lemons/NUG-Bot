@@ -106,6 +106,37 @@ async def nuggets_leaderboard(ctx: lightbulb.Context):
   embed.edit_field(0, "Leaderboard", current_text)
   await ctx.respond(embed)
 
+@nuggets_plugin.command()
+@lightbulb.option("user", "The user you want to give your nuggets away to", hikari.User, required=True)
+@lightbulb.option("amount", "The amount of Nuggets to give away.", hikari.OptionType.INTEGER, required=True)
+@lightbulb.command("give_nuggets", "Give your hard earned nuggets away!", pass_options=True)
+@lightbulb.implements(lightbulb.SlashCommand)
+async def give_nuggets(ctx: lightbulb.Context, user: hikari.User, amount: hikari.OptionType.INTEGER):
+
+  refresh_user_info(ctx.user.id, ctx.user.username)
+  refresh_user_info(user.id, user.username)
+  
+  givers_current_nuggets = int(get_item(ctx.user.id, "nuggets"))
+  receivers_current_nuggets = int(get_item(user.id, "nuggets"))
+  
+
+  if givers_current_nuggets < amount or amount < 1:
+    await ctx.respond("I am afraid you don't have that amount of nuggets to give")
+    return
+  else:
+    givers_new_nuggets = givers_current_nuggets - amount
+    receivers_new_nuggets = receivers_current_nuggets + amount
+
+    set_item(ctx.user.id, givers_current_nuggets, "nuggets")
+    set_item(user.id, receivers_new_nuggets, "nuggets")
+
+    givers_current_nuggets = int(get_item(ctx.user.id, "nuggets"))
+    receivers_current_nuggets = int(get_item(user.id, "nuggets"))
+
+    await ctx.respond(f"You gave {str(amount)} nuggets to {user.username}. You currently have {str(givers_current_nuggets)} nuggets and {user.username} now has {str(receivers_current_nuggets)} nuggets")
+
+  print(givers_new_nuggets, receivers_current_nuggets)
+
 
 @nuggets_plugin.set_error_handler
 async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
@@ -120,6 +151,7 @@ async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
 
 
 def refresh_user_info(user_id, user_name):
+  print(user_id, user_name)
   connection = sqlite3.connect("users.db")
   cursor = connection.cursor()
 
