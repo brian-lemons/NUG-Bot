@@ -172,17 +172,20 @@ def custom_excute(sql: str, data_tuple: tuple):
     connection.close()
 
 
-def complex_query_fetchall(sql: str, binding_list: list):
+def complex_query_fetchall(sql: str, binding_list=None):
     connection = sqlite3.connect("game.db")
     cursor = connection.cursor()
 
-    data_list = []
-    for i in range(len(binding_list)):
-        data_list.append(binding_list[i])
+    if binding_list != None:
+        data_list = []
+        for i in range(len(binding_list)):
+            data_list.append(binding_list[i])
 
-    data_tuple = tuple(data_list)
+        data_tuple = tuple(data_list)
 
-    cursor.execute(sql, data_tuple, )
+        cursor.execute(sql, data_tuple, )
+    
+    cursor.execute(sql)
     
     result = cursor.fetchall()
     connection.close()

@@ -6,12 +6,17 @@ import dotenv
 import asyncio
 import sqlite3
 import miru
+import loaddb
 
 connection = sqlite3.connect("users.db")
 
 dotenv.load_dotenv()
 
-
+#Populate database
+if os.path.exists("game.db"):
+  pass
+else:
+  loaddb.populate_database()
 
 secret_guild = os.environ['SECRET_GUILD']
 bot = lightbulb.BotApp(

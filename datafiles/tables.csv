@@ -1,0 +1,2 @@
+id,table_name,table_string
+0,users,"user_id INTEGER,nuggets INTEGER,user_name TEXT,seeds INTEGER,trees INTEGER,plots INTEGER,plot_price INTEGER"
