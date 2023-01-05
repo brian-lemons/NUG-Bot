@@ -175,8 +175,9 @@ def custom_excute(sql: str, data_tuple: tuple):
 def complex_query_fetchall(sql: str, binding_list=None):
     connection = sqlite3.connect("game.db")
     cursor = connection.cursor()
-
+    print(binding_list)
     if binding_list != None:
+        print(binding_list)
         data_list = []
         for i in range(len(binding_list)):
             data_list.append(binding_list[i])
@@ -184,8 +185,9 @@ def complex_query_fetchall(sql: str, binding_list=None):
         data_tuple = tuple(data_list)
 
         cursor.execute(sql, data_tuple, )
+    else:
     
-    cursor.execute(sql)
+        cursor.execute(sql)
     
     result = cursor.fetchall()
     connection.close()

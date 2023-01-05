@@ -68,6 +68,7 @@ class Cooldown:
         sql = "SELECT * FROM usertimers WHERE user_id=? and timer_name=?"
         bindings = [user_id, timer_name]
         timer_list = database.complex_query_fetchall(sql, bindings)
+        print(user_id, timer_name)
 
         if len(timer_list) > 0:
             return True

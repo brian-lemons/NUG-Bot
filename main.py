@@ -8,7 +8,6 @@ import sqlite3
 import miru
 import loaddb
 
-connection = sqlite3.connect("users.db")
 
 dotenv.load_dotenv()
 
@@ -38,6 +37,5 @@ async def on_stopping(event: hikari.StoppingEvent) -> None:
   await bot.d.aio_session.close()
 
 
-connection.close()
 bot.run()
 
