@@ -5,7 +5,7 @@ import random
 from operator import itemgetter
 from helper import database
 from helper import user
-
+from helper import manager
 
 
 nuggets_plugin = lightbulb.Plugin("nuggets")
@@ -18,41 +18,15 @@ nuggets_plugin = lightbulb.Plugin("nuggets")
                    pass_options=True)
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def nuggets_collect(ctx: lightbulb.Context):
-  nugget_amount = random.randrange(25, 500)
-  default_seed_amount = 1
+  embed=(hikari.Embed(title=f"{ctx.user.username} Nugget Collection"))
 
-  refresh_user_info(ctx.user.id, ctx.user.username)
+  manager.refresh_user_info(ctx.user.id, ctx.user.username)
 
-  player = user.User(ctx.user.id)
+  embed.description=manager.collect_daily_nuggets(ctx.user.id)
+  embed.set_thumbnail("https://i.redd.it/1yp58oe4pby61.png")
+  embed.set_footer("Artwork by noion_art")
 
-  #Set new nugget amount
-  current_nuggets = int(player.nuggets)
-  new_nuggets = current_nuggets + nugget_amount
-  print(new_nuggets)
-
-  player.set_nuggets(new_nuggets, ctx.user.id)
-
-  #Refresh the user
-  player = user.User(ctx.user.id)
-
-
-  
-  if nugget_amount <= 300:
-    current_seeds = int(player.seeds)
-    new_seeds = current_seeds + default_seed_amount
-    player.set_seeds(new_seeds, ctx.user.id)
-    #Refresh the user
-    player = user.User(ctx.user.id)
-    await ctx.respond(
-      "You've found: " + str(nugget_amount) + " nuggets! You now have: " +
-      str(current_nuggets) +
-      " nuggets! Oh, and take this seed I found as well. Might grow into something new!"
-    )
-    return
-
-  await ctx.respond("You've found: " + str(nugget_amount) +
-                      " nuggets! You now have: " + str(player.nuggets) +
-                      " nuggets!")
+  await ctx.respond(embed)
 
 #Check amount command
 @nuggets_plugin.command()
@@ -60,15 +34,12 @@ async def nuggets_collect(ctx: lightbulb.Context):
                    "Check the items you have collected!")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def inventory_nugs(ctx: lightbulb.Context):
-  embed = (
-    hikari.Embed(
-      title="Nugget Collection", 
-    )
-  )
+  embed = (hikari.Embed(title=f"{ctx.user.username}'s Nugget Collection"))
   #Check if user is in database
-  refresh_user_info(ctx.user.id, ctx.user.username)
+  manager.refresh_user_info(ctx.user.id, ctx.user.username)
   
   player = user.User(ctx.user.id)
+  embed.set_thumbnail(ctx.user.avatar_url)
   embed.add_field("Nuggets", str(player.nuggets))
   embed.add_field("Seeds", str(player.seeds))
   embed.add_field("Plots", str(player.plots))
@@ -84,46 +55,12 @@ async def inventory_nugs(ctx: lightbulb.Context):
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def nuggets_leaderboard(ctx: lightbulb.Context):
   embed = (
-    hikari.Embed
-    (
-      title="Most Collected Nuggets", 
-    )
-    .add_field(
-    "Leaderboard", "Placeholder"
-    )
-  )
+            hikari.Embed(
+                title="Most Collected Nuggets",)
+                .add_field("Leaderboard", "Placeholder")
+        )
 
-  #Grab the data
-  sql = "SELECT user_name, nuggets FROM users ORDER BY nuggets ASC"
-  info = database.complex_query_fetchall(sql)
-  users_names = database.convert_tuple_data_into_list(info)
-  nuggets = database.convert_tuple_data_into_list(info, 1)
-  users_and_nuggets = zip(users_names, nuggets)
-
-  
-  #Convert data to list
-  leaderboard_list = []
-  for name, value in users_and_nuggets:
-    user_tuple = (name,value)
-    leaderboard_list.append(user_tuple)
-  
-  leaderboard = dict(leaderboard_list)
-
-  #sort
-  sorted_leaderboard = sorted(leaderboard.items(), key=itemgetter(1))
-  sorted_leaderboard_dict = dict(sorted_leaderboard)
-
-  current_text = ""
-  position = 0
-  position = len(sorted_leaderboard_dict) + 1
-
-
-  for key, value in sorted_leaderboard_dict.items():
-    position -= 1
-    new_text = str(position) + ". " + key + " (" + str(value) + ") \n"
-    current_text = new_text + current_text
-
-  embed.edit_field(0, "Leaderboard", current_text)
+  embed.edit_field(0, "Leaderboard", manager.get_leaderboard())
   await ctx.respond(embed)
 
 @nuggets_plugin.command()
@@ -133,8 +70,8 @@ async def nuggets_leaderboard(ctx: lightbulb.Context):
 @lightbulb.implements(lightbulb.SlashCommand)
 async def give_nuggets(ctx: lightbulb.Context, recipient: hikari.User, amount: hikari.OptionType.INTEGER):
 
-  refresh_user_info(ctx.user.id, ctx.user.username)
-  refresh_user_info(recipient.id, recipient.username)
+  manager.refresh_user_info(ctx.user.id, ctx.user.username)
+  manager.refresh_user_info(recipient.id, recipient.username)
 
   giving_user = user.User(ctx.user.id)
   recipient_user = user.User(recipient.id)
@@ -179,13 +116,6 @@ async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
       f"This command is on cooldown! You can use it again in " + str(time))
     return True
   return False'''
-
-
-def refresh_user_info(user_id, user_name):
-  if database.check_if_data_exists(user_id, "users", "user_id") is False:
-    print(user_id, user_name)
-    print("failed")
-    user.User.create_new_user(user_id, user_name)
 
 
 def load(bot: lightbulb.BotApp) -> None:
