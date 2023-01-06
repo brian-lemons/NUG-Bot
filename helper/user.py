@@ -24,6 +24,25 @@ class User:
         data_tuple = (value, user_id)
         database.custom_excute(sql, data_tuple)
 
+    def set_plot_amount(self, value, user_id):
+        sql = "UPDATE users SET plots=? WHERE user_id=?"
+        data_tuple = (value, user_id)
+        database.custom_excute(sql, data_tuple)
+
+    def set_plot_price(self, user_id):
+
+        #Calculate the cost of the next plot
+        m = 500
+        b = 100
+        if self.plots == 0:
+            cost = 500
+        else:
+            cost = m * self.plots + b
+
+        sql = "UPDATE users SET plot_price=? WHERE user_id=?"
+        data_tuple = (cost, user_id)
+        database.custom_excute(sql, data_tuple)
+
     def set_seeds(self, value, user_id):
         sql = "UPDATE users SET seeds=? WHERE user_id=?"
         data_tuple = (value, user_id)
@@ -34,7 +53,8 @@ class User:
         default_seeds = 0
         default_trees = 0
         default_plots = 0
-        default_plot_price = 0
+        default_plot_price = 500
+        default_planted_plots = 0
 
         user_info = (user_id, default_nuggets, user_name, default_seeds, default_trees, default_plots, default_plot_price)
 

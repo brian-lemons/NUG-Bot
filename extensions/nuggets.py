@@ -1,9 +1,6 @@
 import hikari
 import lightbulb
-import random
 
-from operator import itemgetter
-from helper import database
 from helper import user
 from helper import manager
 
@@ -105,17 +102,6 @@ async def give_nuggets(ctx: lightbulb.Context, recipient: hikari.User, amount: h
 
   print(givers_new_nuggets, recipient_current_nuggets)
 
-'''
-@nuggets_plugin.set_error_handler
-async def on_nuggets_error(event: lightbulb.CommandErrorEvent) -> bool:
-  exception = event.exception.__cause__ or event.exception
-  if isinstance(exception, lightbulb.CommandIsOnCooldown):
-    seconds = int(exception.retry_after)
-    time = datetime.timedelta(seconds=seconds)
-    await event.context.respond(
-      f"This command is on cooldown! You can use it again in " + str(time))
-    return True
-  return False'''
 
 
 def load(bot: lightbulb.BotApp) -> None:

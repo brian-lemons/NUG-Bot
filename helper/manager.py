@@ -62,15 +62,29 @@ def collect_daily_nuggets(user_id)->str:
         player.set_seeds(new_seeds, user_id)
         #Refresh the user
         player = user.User(user_id)
-        return_text=f"You've found: {str(nugget_amount)} nuggets! You now have: {str(current_nuggets)} nuggets! Oh, and take this seed I found as well. Might grow into something new!"
+        return_text=f"You've found: {str(nugget_amount)} nuggets! You now have: {str(player.nuggets)} nuggets! Oh, and take this seed I found as well. Might grow into something new!"
 
         return return_text
     else:
         return_text=f"You've found: {str(nugget_amount)} nuggets! You now have: {str(player.nuggets)} nuggets!"
         return return_text
 
-    
+def buy_plot(user_id):
+    player = user.User(user_id)
+    player_plots = player.plots
+    player_plot_price = player.plot_price
+    player_current_nuggets = player.nuggets
 
+    if player_current_nuggets < player_plot_price:
+        return False
+    else:
+        new_nuggets = player_current_nuggets - player_plot_price
+        player.set_nuggets(new_nuggets, user_id)
+        new_plot_amount = player_plots + 1
+        player.set_plot_amount(new_plot_amount, user_id)
+        return True
+
+    
 def refresh_user_info(user_id, user_name):
   if database.check_if_data_exists(user_id, "users", "user_id") is False:
     user.User.create_new_user(user_id, user_name)

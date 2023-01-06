@@ -77,13 +77,13 @@ class Cooldown:
 
     def get_cooldown_text(self, user_id, timer_name):
         if self.does_timer_exist(user_id, timer_name) is False:
-            cooldown_text = "Galactic Cycle Ready!"
+            cooldown_text = "Collect your Nuggets!"
             return cooldown_text
 
         is_cooldown_active = self.check_if_on_cooldown(user_id, timer_name)
         print(is_cooldown_active)
         if is_cooldown_active == True:
-            cooldown_text = "READY"
+            cooldown_text = "Nugget Collection Ready!"
             return cooldown_text
 
         current_time = datetime.now()
