@@ -84,6 +84,27 @@ def buy_plot(user_id):
         player.set_plot_amount(new_plot_amount, user_id)
         return True
 
+def plant_tree(user_id):
+    player = user.User(user_id)
+    player_plots = player.plots
+    player_current_nuggets = player.nuggets
+    player_seeds = player.seeds
+    player_trees = player.trees
+
+    if player_current_nuggets < 1 or player_seeds < 1:
+        return False
+    else:
+        new_plots = player_plots - 1
+        new_seeds = player_seeds - 1
+        new_trees = player_trees + 1
+
+        player.set_plot_amount(new_plots, user_id)
+        player.set_seeds(new_seeds, user_id)
+        player.set_tree_amount(new_trees, user_id)
+        return True
+
+
+
     
 def refresh_user_info(user_id, user_name):
   if database.check_if_data_exists(user_id, "users", "user_id") is False:

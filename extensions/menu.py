@@ -94,14 +94,66 @@ class MenuView(miru.View):
         await ctx.edit_response(components=self.build())
 
         #Build new view
+        self.embed.title="Buy Menu"
         view = BuyView()
-        message = await ctx.edit_response(components=view.build())
+        message = await ctx.edit_response(self.embed, components=view.build())
         await view.start(message)
         await view.wait()
 
     @miru.button(style=hikari.ButtonStyle.SECONDARY, label="Plant")
     async def plant(self, button: miru.Button, ctx: miru.Context) -> None:
+        manager.refresh_user_info(ctx.user.id, ctx.user.username)
+        player = user.User(ctx.user.id)
+
+        self.embed.title = f"Plant a seed"
+        self.embed.description="<:nugtree:1060915861986218014>"
+        self.embed.add_field("Seeds Available", str(player.seeds))
+        self.embed.add_field("Total Planted Trees", str(player.trees))
+        self.embed.add_field("Available Plots", str(player.plots))
+
+        await ctx.edit_response(self.embed)
+
+        #Clear current view
+        self.clear_items()
+        await ctx.edit_response(components=self.build())
+
+        #Build new view
+        self.embed.title="Plant Menu"
+        view = PlantView()
+        message = await ctx.edit_response(self.embed, components=view.build())
+        await view.start(message)
+        await view.wait()
+
+class PlantView(miru.View):
+    def __init__(self):
+        super().__init__()
+        self.embed = hikari.Embed()
+
+    @miru.button(style=hikari.ButtonStyle.SECONDARY, label="Plant Seed")
+    async def plant(self, button: miru.Button, ctx: miru.Context) -> None:
         pass
+
+    @miru.button(style=hikari.ButtonStyle.DANGER, label="Go Back")
+    async def go_back(self, button: miru.Button, ctx: miru.Context) -> None:
+        manager.refresh_user_info(ctx.user.id, ctx.user.username)
+
+        self.embed.title="NUG Bot Menu"
+
+        is_collection_on_cooldown = check_timer(ctx.user.id, ctx.user.username)
+
+        self.embed.description=f"Hello {ctx.user.username}!"
+        self.embed.set_footer(f"{get_footer_text(ctx.user.id, ctx.user.username)} until you can collect your daily nuggets")
+        await ctx.edit_response(self.embed)
+
+        #Clear current view
+        self.clear_items()
+        await ctx.edit_response(components=self.build())
+
+        #Build new view
+        view = MenuView(is_collection_on_cooldown)
+        message = await ctx.edit_response(components=view.build())
+        await view.start(message)
+        await view.wait()
 
 class BuyView(miru.View):
     def __init__(self):
@@ -117,6 +169,7 @@ class BuyView(miru.View):
         self.embed.title = f"Purchase a New Plot"
         self.embed.add_field(f"Current Plots", str(player.plots))
         self.embed.add_field("Plot Price Cost", str(player.plot_price))
+        self.embed.add_field("Current Nuggets", str(player.nuggets))
 
         await ctx.edit_response(self.embed)
 
@@ -170,6 +223,9 @@ class BuyPlotView(miru.View):
 
     
         self.embed.title="NUG Bot Menu"
+
+        player = user.User(ctx.user.id)
+        player.set_plot_price(ctx.user.id)
 
         #Clear current view
         self.clear_items()

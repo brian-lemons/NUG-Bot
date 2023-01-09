@@ -48,13 +48,17 @@ class User:
         data_tuple = (value, user_id)
         database.custom_excute(sql, data_tuple)
 
+    def set_tree_amount(self, value, user_id):
+        sql = "UPDATE users SET trees=? WHERE user_id=?"
+        data_tuple = (value, user_id)
+        database.custom_excute(sql, data_tuple)
+
     def create_new_user(user_id, user_name):
         default_nuggets = 0
         default_seeds = 0
         default_trees = 0
         default_plots = 0
         default_plot_price = 500
-        default_planted_plots = 0
 
         user_info = (user_id, default_nuggets, user_name, default_seeds, default_trees, default_plots, default_plot_price)
 
